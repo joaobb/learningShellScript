@@ -1,4 +1,5 @@
 #!/bin/bash
+#Author: joaobb
 
 #Variables
 weekDay=$(date +%u);                     #Day of the week 1...7 (1 == Monday)
