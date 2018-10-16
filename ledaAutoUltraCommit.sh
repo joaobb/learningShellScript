@@ -1,8 +1,15 @@
 #!/bin/bash
 #Author: joaobb
 
-git config credential.helper store              #Storages users github info
-git pull                                        #Pulls your LEDA repository
+read -p "Do you want to commit it to gitHub? [y/n] -> " gitUse;
+
+if [ "$gitUse" != "${gitUse#[YySs1]}" ] ;       #Checks if the user wants to use gitHub
+then 
+    gitUse=1                                    #gitHub will be used
+    git config credential.helper store          #Storages users github info
+    git pull                                    #Pulls your LEDA repository
+else gitUse=0
+fi
 
 weekDay=$(date +%u);                            #Day of the week 1...7 (1 == Monday)
 
@@ -53,9 +60,11 @@ echo $roteiroId $matricula > lastRoteiro.data   #Storages the new roteiro id and
 
 echo "Time spent: "$(date +"%M:%S")             #Prints the time to conclude the submit
 
-#Commits the changes to your github repository master branch
-git add .
-git commit -m "Adição de roteiro" $roteiroId    #Commit message follows the "Adição de roteiro X" pattern
-git push origin master
+if [ $gitUse -eq 1] ; 
+then                                            #Commits the changes to your github repository master branch
+    git add .
+    git commit -m "Adição de roteiro" $roteiroId #Commit message follows the "Adição de roteiro X" pattern
+    git push origin master
+fi
 
 echo "Thank you for using this thing"
