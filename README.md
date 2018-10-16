@@ -1,2 +1,2 @@
 # learningShellScript
-Hello Walters
+Hello Walter
