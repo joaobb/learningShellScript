@@ -1,2 +1,2 @@
 # learningShellScript
-Hello Walter
+officeBoy = "Hello Walter"
