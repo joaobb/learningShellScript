@@ -1,4 +1,4 @@
-#Gets the server actual date
+#Gets the server current date
 serverDate=$(curl -s 150.165.85.29:81/horaAtual | cut -d" " -f7)
 #serverDate=$(cat horaAtual | cut -d" " -f7)
 if [ $(curl -s 150.165.85.29:81/cronograma | grep -c $serverDate) -gt 0 ] ;then

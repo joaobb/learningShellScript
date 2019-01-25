@@ -19,23 +19,42 @@ function user() {
 
     if [ -e "lastRoteiro.data" ]; then                              #Verifies if it is the first time submitting for yourself
                                                                     #Reads lastRoteiro.data data and assigns data to variables
-        read -r roteiroId matricula turma < lastRoteiro.data
+        read -r matricula turma < lastRoteiro.data
     else                                                             #Gets alunos matricula, roteiroId and turma as input
-       dataInput matricula, roteiroId, turma;
+       dataInput matricula, turma;
     fi
+}
+
+function getData() {
+    #Gets the server current date
+    serverDate=$(curl -s 150.165.85.29:81/horaAtual | cut -d" " -f7)
+    #serverDate=$(cat horaAtual | cut -d" " -f7)
+    if [ $(curl -s 150.165.85.29:81/cronograma | grep -c $serverDate) -gt 0 ] ;then
+        #Gets the server current time
+        serverHour=$(curl -s http://150.165.85.29:81/horaAtual |  cut -d' ' -f8)
+        #Gets the hour that the commit should happen
+        commitHour=$(curl -s 150.165.85.29:81/cronograma | grep $serverDate | grep -o -m 1 [[:digit:]][[:digit:]]:[[:digit:]][[:digit:]])
+        #Roteiro Id of the day
+        $roteiroName=$(curl -s 150.165.85.29:81/cronograma | grep -B1 -m 1 $serverDate | cut -d"-" -f6 | cut -d ">" -f2)
+        secTillComm=${${commitHour:0:2} * 3600 + ${commitHour:2:2} * 60 + ${commitHour:4:2}}
+        echo $commitHour
+        echo $roteiroName
+    else
+        echo "No roteiro today :D";
+    fi
+
+    echo $serverDate
 }
 
 function dataInput() {
     read -p "Matricula to be submitted: (XXXXXXXXX): " matricula;   #Gets for matricula
     read -p "Aluno's turma: (X) " turma;                            #Gets turma of aluno
-    read -p "Current roteiro digit: (RXX-01) " roteiroId;           #Gets roteiro id
 }
 
 function gitHubCommit() {
-    echo "Commiting to gitHub"
-    ((roteiroId--))                                                 #Adjusts the data to commit it to github
+    echo "Commiting to gitHub ..."
     git add .
-    git commit -m "Adição de roteiro $roteiroId"
+    git commit -m "Adição de roteiro $roteiroName"
     git push
 }
 
