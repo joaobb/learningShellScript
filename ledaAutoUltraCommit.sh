@@ -26,16 +26,21 @@ function user() {
 }
 
 function getData() {
+    #Gets leda's cronograma page
+    cronograma=$(curl -s http://150.165.85.29:81/cronograma)
+    #Gets leda's server time page
+    serverTime=$(curl -s http://150.165.85.29:81/horaAtual)
+
     #Gets the server current date
-    serverDate=$(curl -s 150.165.85.29:81/horaAtual | cut -d" " -f7)
+    serverDate=$(echo $serverTime | grep -E -o [[:digit:]]{2}/[[:digit:]]{2}/[[:digit:]]{4})
     #serverDate=$(cat horaAtual | cut -d" " -f7)
-    if [ $(cat menu.html | grep -c $serverDate) -gt 0 ] ;then
+    if [ $(echo $cronograma | grep -c $serverDate) -gt 0 ] ;then
         #Gets the server current time
-        serverHour=$(curl -s http://150.165.85.29:81/horaAtual |  cut -d' ' -f8)
+        serverHour=$(echo $serverTime | grep -E -o [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2})
         #Gets the hour that the commit should happen
-        commitHour=$(cat menu.html | grep $serverDate | grep -o -m 1 [[:digit:]][[:digit:]]:[[:digit:]][[:digit:]])
+        commitHour=$(echo $cronograma | grep $serverDate | grep -E -o -m 1 [[:digit:]]{2}:[[:digit:]]{2})
         #Roteiro's Id of the day
-        roteiroName=$(cat menu.html | grep -B1 -m 1 $serverDate | cut -d"-" -f6 | cut -d ">" -f2)
+        roteiroName=$(echo $cronograma | grep -B1 -m 1 $serverDate | cut -d"-" -f6 | cut -d ">" -f2)
         #Gambi para que numeros como 08 nao sejam reconhecidos como octal
         serverSec=${serverHour:6:2}
         secUntilCommit=$(( (${commitHour:0:2} - ${serverHour:0:2}) * 3600 + (${commitHour:3:2} - ${serverHour:3:2}) * 60 + ${serverSec#0} ))
@@ -49,9 +54,9 @@ function getData() {
 function dataInput() {
     read -p "Matricula to be submitted: (XXXXXXXXX): " matricula;   #Gets for matricula
     read -p "Aluno's turma: (X) " turma;                            #Gets turma of aluno
-	if [ $turma > 3 -o $turma < 1 -o $matricula < 100000000 -o $matricula > 999999999] ; then
+	if [ $turma -gt 3 -o $turma -lt 1 -o $matricula -lt 100000000 -o $matricula -gt 999999999 ] ; then
 		echo "Wrong input, please try again"
-		exit 1;
+    bash ledaAutoUltraCommit.sh
 	fi
 }
 
