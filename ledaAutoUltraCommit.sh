@@ -38,9 +38,10 @@ function getData() {
         #Gets the server current time
         serverHour=$(echo $serverTime | grep -E -o [[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2})
         #Gets the hour that the commit should happen
-        commitHour=$(echo $cronograma | grep $serverDate | grep -E -o -m 1 [[:digit:]]{2}:[[:digit:]]{2})
+        commitHour=$(curl -s http://150.165.85.29:81/cronograma | grep $serverDate | grep -E -o -m 1 [[:digit:]]{2}:[[:digit:]]{2})
         #Roteiro's Id of the day
-        roteiroName=$(echo $cronograma | grep -B1 -m 1 $serverDate | cut -d"-" -f6 | cut -d ">" -f2)
+        roteiroName=$(curl -s http://150.165.85.29:81/cronograma| grep -B1 -m 1 $serverDate | cut -d"-" -f6 | cut -d ">" -f2)
+        echo $roteiroName
         #Gambi para que numeros como 08 nao sejam reconhecidos como octal
         serverSec=${serverHour:6:2}
         secUntilCommit=$(( (${commitHour:0:2} - ${serverHour:0:2}) * 3600 + (${commitHour:3:2} - ${serverHour:3:2}) * 60 + ${serverSec#0} ))
@@ -81,13 +82,16 @@ case "$userSubmit" in                                              #Checks if ro
    exit 1;;
 esac
 
-# while [ $secUntilCommit != -1 ];
-#   do
-#     sleep 1;                                                        #Sleeps for 1 sec
-#     # clear;                                                          #Clear the terminal
-#     echo "Time until commit "$(date -d@$secUntilCommit -u +%H:%M:%S);
-#     (( secUntilCommit-- ))
-#   done
+LOADING=('|' '/' '--' '\')
+
+while [ $secUntilCommit != -1 ];
+    do
+        sleep 1;                                                        #Sleeps for 1 sec
+        clear;                                                          #Clear the terminal
+        echo "Time until commit "$(date -d@$secUntilCommit -u +%H:%M:%S);
+        echo ${LOADING[ $secUntilCommit % 4]}
+        (( secUntilCommit-- ))
+done
 
 roteiroName=$roteiroName"-0"$turma
 
