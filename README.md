@@ -5,4 +5,4 @@ So, this is the place I keep some of these mayonnaise's travels.
 
 I hope you have fun :)
 
-bye, have a nice day :D
+bye, have a nice day :D xD
